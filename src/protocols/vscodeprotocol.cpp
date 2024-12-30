@@ -575,8 +575,13 @@ static HRESULT HandleCommand(std::shared_ptr<IDebugger> &sharedDebugger, std::st
         for (auto &b : arguments.at("breakpoints"))
             lineBreakpoints.emplace_back(std::string(), b.at("line"), b.value("condition", std::string()));
 
+        std::string source = arguments.at("source").at("path");
+#ifdef WIN32
+        std::replace(source.begin(), source.end(), '/', '\\');
+#endif
+
         std::vector<Breakpoint> breakpoints;
-        IfFailRet(sharedDebugger->SetLineBreakpoints(arguments.at("source").at("path"), lineBreakpoints, breakpoints));
+        IfFailRet(sharedDebugger->SetLineBreakpoints(source, lineBreakpoints, breakpoints));
 
         body["breakpoints"] = breakpoints;
 
